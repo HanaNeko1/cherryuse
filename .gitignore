@@ -1,0 +1,9 @@
+# Python virtual env created by setup.ps1 (machine-specific, never commit)
+venv/
+__pycache__/
+*.pyc
+
+# Local diagram output
+diagrams/
+*.png
+!docs/*.png
