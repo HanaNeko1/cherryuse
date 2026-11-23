@@ -1,6 +1,6 @@
 # cherryuse
 
-个人 Cherry Studio Skill 仓库，用于在多台电脑之间共享技能。
+个人 Cherry Studio Skill 仓库，用于在多台电脑之间共享技能，本仓库交由Agent更新和维护。
 
 ## 技能列表
 
