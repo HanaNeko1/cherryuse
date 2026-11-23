@@ -7,6 +7,7 @@
 | 技能 | 用途 |
 |---|---|
 | [`tech-diagram`](skills/tech-diagram/SKILL.md) | 技术问题配图：Mermaid 框图、schemdraw 电路图、matplotlib 波形图，并内嵌显示在对话中 |
+| [`docx`](skills/docx/SKILL.md) | Word 文档创建、读取、编辑：目录、表格、图片、修订、批注（Apache-2.0，来源 anthropics/skills） |
 
 ## 目录结构
 
@@ -15,15 +16,20 @@ cherryuse/
 ├── README.md
 ├── .gitignore
 └── skills/
-    └── tech-diagram/          ← 技能目录名必须与 SKILL.md 里的 name 一致
+    ├── tech-diagram/          ← 技能目录名必须与 SKILL.md 里的 name 一致
+    │   ├── SKILL.md
+    │   ├── setup.ps1
+    │   ├── scripts/
+    │   │   ├── imgserver.py
+    │   │   └── ensure_imgserver.ps1
+    │   └── examples/
+    │       ├── circuit_buck.py
+    │       └── waveform_buck.py
+    └── docx/
         ├── SKILL.md
+        ├── LICENSE.txt        ← Apache-2.0
         ├── setup.ps1
-        ├── scripts/
-        │   ├── imgserver.py
-        │   └── ensure_imgserver.ps1
-        └── examples/
-            ├── circuit_buck.py
-            └── waveform_buck.py
+        └── scripts/
 ```
 
 新增技能时，在 `skills/` 下建同名目录，放入 `SKILL.md` 即可。
@@ -65,6 +71,6 @@ git pull
 
 ## 说明
 
-- `venv/` 是本机生成的 Python 环境，已在 `.gitignore` 中排除，不要提交
+- `venv/` 和 `node_modules/` 是本机生成的依赖目录，已在 `.gitignore` 中排除，不要提交
 - 技能里的脚本全部使用相对路径，不绑定具体机器
-- 图片服务只绑定 `127.0.0.1`，仅返回图片文件
+- `docx` 技能的 PDF 渲染验证需要 LibreOffice（`soffice`），不装不影响生成 .docx

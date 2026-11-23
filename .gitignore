@@ -3,6 +3,9 @@ venv/
 __pycache__/
 *.pyc
 
+# Node dependencies installed by setup.ps1
+node_modules/
+
 # Local diagram output
 diagrams/
 *.png
