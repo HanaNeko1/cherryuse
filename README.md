@@ -8,6 +8,7 @@
 |---|---|
 | [`tech-diagram`](skills/tech-diagram/SKILL.md) | 技术问题配图：Mermaid 框图、schemdraw 电路图、matplotlib 波形图，并内嵌显示在对话中 |
 | [`docx`](skills/docx/SKILL.md) | Word 文档创建、读取、编辑：目录、表格、图片、修订、批注（Apache-2.0，来源 anthropics/skills） |
+| [`humanizer-zh-academic`](skills/humanizer-zh-academic/SKILL.md) | 中文学术写作去 AI 味：识别并改写 AI 写作模式，降低 AIGC 检测率（MIT，来源 redbaronyyyyy-eng） |
 
 ## 目录结构
 
@@ -25,11 +26,16 @@ cherryuse/
     │   └── examples/
     │       ├── circuit_buck.py
     │       └── waveform_buck.py
-    └── docx/
+    ├── docx/
+    │   ├── SKILL.md
+    │   ├── LICENSE.txt        ← Apache-2.0
+    │   ├── setup.ps1
+    │   └── scripts/
+    └── humanizer-zh-academic/
         ├── SKILL.md
-        ├── LICENSE.txt        ← Apache-2.0
-        ├── setup.ps1
-        └── scripts/
+        ├── SKILL_full.md
+        ├── README.md
+        └── LICENSE            ← MIT
 ```
 
 新增技能时，在 `skills/` 下建同名目录，放入 `SKILL.md` 即可。
