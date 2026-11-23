@@ -269,3 +269,17 @@ ls -1 "$PWD"/slide-*.jpg
 ## Dependencies
 
 `pptxgenjs` (npm, preinstalled — install only if `require('pptxgenjs')` fails) · `python-pptx`, `Pillow`, `defusedxml`, `lxml` (pip — slide_text, thumbnail, clean, validate) · LibreOffice (`soffice`, auto-configured for sandboxed environments via `scripts/office/soffice.py`) · `pdftoppm` (Poppler)
+
+---
+
+## Local setup (cherryuse repository)
+
+This copy ships a `setup.ps1` beside this file. Run it once on a new machine:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "<this skill folder>\setup.ps1"
+```
+
+Installs pptxgenjs (bun) and the Python helpers (python-pptx, Pillow, defusedxml, lxml).
+
+Full deployment steps and original download sources: https://github.com/HanaNeko1/cherryuse/blob/main/DEPLOY.md

@@ -312,3 +312,17 @@ with open("encrypted.pdf", "wb") as output:
 - For JavaScript libraries (pdf-lib), see REFERENCE.md
 - If you need to fill out a PDF form, follow the instructions in FORMS.md
 - For troubleshooting guides, see REFERENCE.md
+
+---
+
+## Local setup (cherryuse repository)
+
+This copy ships a `setup.ps1` beside this file. Run it once on a new machine:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "<this skill folder>\setup.ps1"
+```
+
+Installs the Python PDF libraries. Add `-InstallOcr` to also install Tesseract and Poppler for scanned PDFs.
+
+Full deployment steps and original download sources: https://github.com/HanaNeko1/cherryuse/blob/main/DEPLOY.md

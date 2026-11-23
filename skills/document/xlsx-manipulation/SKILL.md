@@ -493,3 +493,17 @@ pip install openpyxl
 - [openpyxl Documentation](https://openpyxl.readthedocs.io/)
 - [GitHub Repository](https://github.com/theorchard/openpyxl)
 - [Working with Styles](https://openpyxl.readthedocs.io/en/stable/styles.html)
+
+---
+
+## Local setup (cherryuse repository)
+
+This copy ships a `setup.ps1` beside this file. Run it once on a new machine:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "<this skill folder>\setup.ps1"
+```
+
+Installs openpyxl.
+
+Full deployment steps and original download sources: https://github.com/HanaNeko1/cherryuse/blob/main/DEPLOY.md

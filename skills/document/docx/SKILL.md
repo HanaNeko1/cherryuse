@@ -90,3 +90,17 @@ The script writes `comments.xml`, `commentsExtended.xml`, `commentsIds.xml`, `co
 ## Dependencies
 
 `docx` (npm, preinstalled — install only if `require('docx')` fails) · `pandoc` · LibreOffice (`soffice`) · `pdftoppm` (Poppler)
+
+---
+
+## Local setup (cherryuse repository)
+
+This copy ships a `setup.ps1` beside this file. Run it once on a new machine:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "<this skill folder>\setup.ps1"
+```
+
+Installs docx-js (bun) and the Python helpers (lxml, defusedxml).
+
+Full deployment steps and original download sources: https://github.com/HanaNeko1/cherryuse/blob/main/DEPLOY.md

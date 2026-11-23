@@ -505,3 +505,17 @@ Academic-specific:
 ## Help pointer
 
 When in doubt: `officecli help docx`, `officecli help docx <element>`, `officecli help docx <element> --json`. Help is the authoritative schema; this skill is the decision guide for academic deltas on top of docx v2.
+
+---
+
+## Local setup (cherryuse repository)
+
+This copy ships a `setup.ps1` beside this file. Run it once on a new machine:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "<this skill folder>\setup.ps1"
+```
+
+Add `-Install` when officecli is missing: it downloads the official GitHub release (officecli-win-x64.exe), verifies SHA256SUMS, installs to %LOCALAPPDATA%\Programs\officecli and adds it to PATH.
+
+Full deployment steps and original download sources: https://github.com/HanaNeko1/cherryuse/blob/main/DEPLOY.md

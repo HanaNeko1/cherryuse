@@ -57,6 +57,8 @@ cherryuse/
 
 ## 在另一台电脑安装
 
+完整的可执行步骤、原始下载源和验证清单见 **[DEPLOY.md](DEPLOY.md)**。以下是速览。
+
 **1. 通过 GitHub 链接安装**
 
 在目标机器的 Cherry Studio 里，对 Agent 说：
@@ -84,6 +86,9 @@ cherryuse/
 powershell -ExecutionPolicy Bypass -File "<技能目录>\setup.ps1"
 ```
 
+- `pdf`：加 `-InstallOcr` 可一并安装 Tesseract + Poppler
+- `officecli-academic-paper`：加 `-Install` 会从 GitHub Releases 下载并校验 officecli CLI
+
 ## 依赖一览
 
 | 技能 | 依赖 |
@@ -102,7 +107,7 @@ Python 环境统一放在各技能目录的 `venv/`，npm 依赖放在 `node_mod
 - `docx` / `pdf` / `pptx`：Apache-2.0（来源 anthropics/skills），附 LICENSE.txt
 - `xlsx-manipulation`：MIT（SKILL.md 元数据声明）
 - `humanizer-zh-academic`：MIT，附 LICENSE
-- `officecli-docx` / `officecli-academic-paper`：技能内**未标注许可证**。公开仓库再分发前建议先确认作者授权；如只需要本地使用，可以不提交这两个目录
+- `officecli-docx` / `officecli-academic-paper`：技能内**未标注许可证**。公开仓库再分发前建议先确认作者授权；如果不想依赖本仓库，可按 [DEPLOY.md](DEPLOY.md) 的「方式 B」从原始来源安装（`clawhub:iceyliu/...`）
 
 ## 更新
 
