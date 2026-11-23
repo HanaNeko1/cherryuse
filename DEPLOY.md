@@ -1,6 +1,6 @@
 # 部署指南
 
-供「另一台电脑上的 Agent」阅读并执行。README 是索引，本文件是可操作的细节。
+供Agent阅读并执行。README 是索引，本文件是可操作的细节。
 
 ## 0. 前置检查
 
@@ -24,7 +24,7 @@ git --version
 
 ### 方式 A：从本仓库安装（默认）
 
-对 Agent 说：
+执行：
 
 > 安装这个技能：https://github.com/HanaNeko1/cherryuse/blob/main/skills/<路径>/SKILL.md
 
