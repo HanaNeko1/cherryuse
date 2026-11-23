@@ -100,7 +100,7 @@ powershell -ExecutionPolicy Bypass -File "<技能目录>\setup.ps1"
 | xlsx-manipulation | Python venv：openpyxl |
 | officecli-* | `officecli` CLI（需单独安装）+ officecli-docx 技能 |
 
-Python 环境统一放在各技能目录的 `venv/`，npm 依赖放在 `node_modules/`，两者都不提交到仓库。
+Python 环境统一置于各技能目录的 `venv/`，npm 依赖置于 `node_modules/`，两者都不提交到仓库。
 
 ## 许可
 
