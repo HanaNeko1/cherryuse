@@ -1,4 +1,4 @@
-# setup.ps1 — one-time dependency setup for the pptx skill.
+# setup.ps1 - one-time dependency setup for the pptx skill.
 # Installs pptxgenjs (bun) + Python helpers (python-pptx, Pillow, defusedxml, lxml).
 
 $skillDir = $PSScriptRoot
@@ -8,7 +8,7 @@ $mirror = 'https://pypi.tuna.tsinghua.edu.cn/simple'
 
 $bun = Get-Command bun -ErrorAction SilentlyContinue
 if (-not $bun) {
-    Write-Output 'BUN_MISSING: 需要 bun（Cherry Studio 自带）或 Node.js'
+    Write-Output 'BUN_MISSING: bun is required (bundled with Cherry Studio) or install Node.js'
     exit 1
 }
 Push-Location $skillDir
@@ -19,7 +19,7 @@ if ($code -ne 0) { Write-Output 'PPTXGENJS_INSTALL_FAILED'; exit 1 }
 
 $uv = Get-Command uv -ErrorAction SilentlyContinue
 if (-not $uv) {
-    Write-Output 'UV_MISSING: 跳过 Python 依赖（python-pptx 等）'
+    Write-Output 'UV_MISSING: skipping Python deps (python-pptx etc.)'
     exit 1
 }
 if (-not (Test-Path $py)) {

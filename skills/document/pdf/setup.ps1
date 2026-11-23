@@ -1,4 +1,4 @@
-# setup.ps1 — one-time dependency setup for the pdf skill.
+# setup.ps1 - one-time dependency setup for the pdf skill.
 # Installs Python PDF libraries. OCR additionally needs tesseract + poppler binaries.
 
 $skillDir = $PSScriptRoot
@@ -8,7 +8,7 @@ $mirror = 'https://pypi.tuna.tsinghua.edu.cn/simple'
 
 $uv = Get-Command uv -ErrorAction SilentlyContinue
 if (-not $uv) {
-    Write-Output 'UV_MISSING: 请先安装 uv（winget install --id=astral-sh.uv -e）'
+    Write-Output 'UV_MISSING: install uv first (winget install --id=astral-sh.uv -e)'
     exit 1
 }
 
@@ -21,4 +21,4 @@ if ($LASTEXITCODE -ne 0) { Write-Output 'DEPS_FAILED'; exit 1 }
 
 & $py -c "import pypdf, pdfplumber, reportlab, pypdfium2; print('SETUP_OK')"
 
-Write-Output 'NOTE: OCR（pytesseract/pdf2image）还需要系统安装 tesseract 和 poppler，否则只能处理文本型 PDF'
+Write-Output 'NOTE: OCR (pytesseract/pdf2image) also needs tesseract and poppler installed system-wide'

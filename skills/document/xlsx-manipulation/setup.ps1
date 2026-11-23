@@ -1,4 +1,4 @@
-# setup.ps1 — one-time dependency setup for the xlsx-manipulation skill.
+# setup.ps1 - one-time dependency setup for the xlsx-manipulation skill.
 
 $skillDir = $PSScriptRoot
 $venv = Join-Path $skillDir 'venv'
@@ -7,7 +7,7 @@ $mirror = 'https://pypi.tuna.tsinghua.edu.cn/simple'
 
 $uv = Get-Command uv -ErrorAction SilentlyContinue
 if (-not $uv) {
-    Write-Output 'UV_MISSING: 请先安装 uv（winget install --id=astral-sh.uv -e）'
+    Write-Output 'UV_MISSING: install uv first (winget install --id=astral-sh.uv -e)'
     exit 1
 }
 

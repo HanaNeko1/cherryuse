@@ -11,7 +11,7 @@ Write-Output "skill dir: $skillDir"
 # 1) JS: docx-js (used for creating documents)
 $bun = Get-Command bun -ErrorAction SilentlyContinue
 if (-not $bun) {
-    Write-Output 'BUN_MISSING: 需要 bun（Cherry Studio 自带）或 Node.js'
+    Write-Output 'BUN_MISSING: bun is required (bundled with Cherry Studio) or install Node.js'
     exit 1
 }
 Push-Location $skillDir
@@ -28,13 +28,13 @@ if ($uv) {
     }
     uv pip install --python "$py" lxml defusedxml --index-url $mirror
 } else {
-    Write-Output 'UV_MISSING: 跳过 Python 依赖（lxml/defusedxml），校验与批注脚本将不可用'
+    Write-Output 'UV_MISSING: skipping Python deps (lxml/defusedxml); validation and comment scripts will be unavailable'
 }
 
 # 3) Optional: LibreOffice for PDF rendering / .doc conversion
 $soffice = Get-Command soffice -ErrorAction SilentlyContinue
 if (-not $soffice) {
-    Write-Output 'NOTE: 未检测到 LibreOffice，PDF 渲染验证与 .doc 转换不可用（不影响生成 .docx）'
+    Write-Output 'NOTE: LibreOffice not found; PDF rendering verification and .doc conversion are unavailable (docx generation is unaffected)'
 }
 
 Write-Output 'SETUP_OK'
