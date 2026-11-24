@@ -137,7 +137,7 @@ elseif ($behind -gt 0 -and $ahead -gt 0) {
     if ($rb.Code -ne 0) {
         $ab = Invoke-Git @('rebase', '--abort')
         Write-Output 'PREP_FAIL: rebase conflict - local commits are untouched after the abort'
-        Write-Output 'next   : resolve by hand (git rebase origin/' + $branch + '), or reset to origin and redo the work'
+        Write-Output "next   : resolve by hand (git rebase origin/$branch), or reset to origin and redo the work"
         if ($stashed) { Write-Output 'note   : your edits are still in the stash, run: git stash pop' }
         exit 2
     }
