@@ -5,6 +5,8 @@
 > 已经在本机部署过、只是要改仓库内容时，先跑 `scripts\prep.ps1`（见第 6 节），跳过下面全部内容。
 >
 > 另：`AQUARIUM.md`（水族箱）是常驻 agent「大肥鱼」的私有文件，**只读，任何其他 agent 不得修改**，详见 README「专属区域」。
+>
+> 要接 MATLAB / Simulink 时（官方 MCP，不含在本技能的安装流程里），照 [`mcp/matlab-mcp/README.md`](mcp/matlab-mcp/README.md) 做。
 
 ## 0. 前置检查
 
