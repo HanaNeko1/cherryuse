@@ -22,7 +22,7 @@ import time
 import xmlrpc.client
 
 PLECS_RPC_URL = os.environ.get("PLECS_RPC_URL", "http://localhost:1080")
-SERVER_INFO = {"name": "plecs-mcp", "version": "1.2.0"}
+SERVER_INFO = {"name": "plecs-mcp", "version": "1.3.0"}
 MAX_OUTPUT_CHARS = 60000
 
 # 仿真结果超过这个体积就自动转成摘要 + 落盘，避免把上下文塞满
@@ -336,6 +336,71 @@ def tool_scope(args):
     return {"ok": True, "scope": scope_path, "action": action, "result": result}
 
 
+def tool_trace_read(args):
+    """解析 .trace（Scope 的 SaveTraces 产物），返回每通道统计量。
+
+    解析器为自研实现（见 trace_reader.py），对照 PLECS 4.7.4 的 simulate 输出逐点验证过。
+    """
+    path = args.get("path")
+    if not path:
+        raise RuntimeError("缺少 path（.trace 文件的绝对路径）")
+    if not os.path.exists(path):
+        raise RuntimeError("文件不存在：{}".format(path))
+    try:
+        from trace_reader import read_trace, write_csv, TraceError
+    except ImportError as e:
+        raise RuntimeError("缺少 trace_reader.py（需与本脚本放在同一目录）：{}".format(e)) from e
+
+    max_curves = args.get("max_curves") or 0
+    stats_only = bool(args.get("stats_only"))
+    csv_path = args.get("csv")
+    preview_points = args.get("preview_points") or 0
+
+    try:
+        curves = read_trace(path, max_curves=int(max_curves), keep=not stats_only)
+    except TraceError as e:
+        raise RuntimeError("解析 .trace 失败：{}".format(e)) from e
+
+    out_curves = []
+    for i, c in enumerate(curves):
+        st = c.stats()
+        item = {
+            "index": i,
+            "trace": c.trace,
+            "signal": c.signal,
+            "n": st.get("n"),
+            "min": st.get("min"),
+            "max": st.get("max"),
+            "mean": st.get("mean", st.get("avg")),
+            "rms": st.get("rms"),
+            "p2p": st.get("p2p", st.get("pp")),
+        }
+        if c.t and not stats_only:
+            item["t_start"] = c.t[0]
+            item["t_end"] = c.t[-1]
+        if preview_points and c.t and not stats_only:
+            step = max(1, len(c.t) // int(preview_points))
+            item["preview"] = {
+                "t": c.t[::step][:int(preview_points)],
+                "v": c.v[::step][:int(preview_points)],
+            }
+        out_curves.append(item)
+
+    result = {
+        "path": os.path.abspath(path),
+        "size": os.path.getsize(path),
+        "curve_count": len(curves),
+        "curves": out_curves,
+    }
+    if csv_path:
+        if stats_only:
+            result["csv"] = None
+            result["note"] = "stats_only=true 时数据未保留，未导出 CSV"
+        else:
+            result["csv"] = write_csv(csv_path, curves)
+    return result
+
+
 def tool_codegen(args):
     """对模型 / 子系统生成代码（签名待对照本机文档验证）。"""
     path = args.get("path")
@@ -506,6 +571,21 @@ TOOLS = [
         },
     },
     {
+        "name": "plecs_trace_read",
+        "description": "解析 Scope 的 SaveTraces 产出的 .trace 二进制文件，返回每通道统计量（min/max/mean/rms/p2p/n），可选导出 CSV 或预览若干点。模型顶层没 outport 时，这是取波形的正路。",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": ".trace 文件绝对路径"},
+                "max_curves": {"type": "integer", "description": "只解析前 N 条曲线（0 = 全部）"},
+                "stats_only": {"type": "boolean", "description": "true = 不保留数组，只算统计量（大文件省内存，但不能导 CSV）"},
+                "csv": {"type": "string", "description": "导出 CSV 的路径（可选）"},
+                "preview_points": {"type": "integer", "description": "每条曲线预览点数（0 = 不预览）"},
+            },
+            "required": ["path"],
+        },
+    },
+    {
         "name": "plecs_call",
         "description": "通用透传：调用任意 PLECS RPC 命令（analyze / statistics / webserver 等未单独封装的命令）。method 为命令名，args 为位置参数列表。",
         "inputSchema": {
@@ -529,6 +609,7 @@ TOOL_IMPL = {
     "plecs_simulate": tool_simulate,
     "plecs_scope": tool_scope,
     "plecs_codegen": tool_codegen,
+    "plecs_trace_read": tool_trace_read,
     "plecs_call": tool_call,
 }
 

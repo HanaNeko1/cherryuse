@@ -205,7 +205,7 @@ Get-NetTCPConnection -LocalPort 1080 -State Listen
 | 命令 | `D:\PRRRRRRODUCTIN\ServBay\packages\python\current\python.exe`（任何装得到的 Python 3.8+ 都行） |
 | 参数 | 服务端脚本的绝对路径 |
 
-3. 保存后确认工具列表里出现 `plecs_status` / `plecs_simulate` 等十个工具
+3. 保存后确认工具列表里出现 `plecs_status` / `plecs_simulate` 等十一个工具
 
 改完服务端代码后要**重启 Cherry Studio**（或重新连接该 MCP）才会加载新版本。
 

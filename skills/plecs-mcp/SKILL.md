@@ -32,6 +32,7 @@ Agent ──MCP(stdio)──> plecs_mcp_server.py ──XML-RPC :1080──> PLE
 | `plecs_simulate` | — | 跑仿真；支持 `params`/`solver_opts`/`model_name`/`summary`/`max_points`/`save_to` |
 | `plecs_scope` | `scope_path` | Scope 操作（`ClearTraces` / `HoldTrace`） |
 | `plecs_codegen` | `path` | 代码生成 |
+| `plecs_trace_read` | `path` | 解析 `.trace`（Scope 的 SaveTraces 产物），可选 CSV / 预览 |
 | `plecs_call` | `method` | 透传其他 PLECS RPC 方法 |
 
 `path` 写法 `模型名/元件名`，例如 `buck_converter_with_parameter_sweep/R1`；`param` 是元件属性，常见 `R`、`C`、`L`、`Vf`、`Ron`。
@@ -89,6 +90,23 @@ RPC 开关持久化在注册表 `HKCU\Software\Plexim\PLECS4.7` → `XmlRpcEnabl
 | `-32602 invalid method parameters` | 参数个数/形状不对 | 按签名传，如 `analyze` 要三个位置参数 |
 | `-32500 method execution error: Cannot find analysis named 'X'` | 参数对了，但模型里没有这个分析工具 | 换成模型里真实存在的分析名 |
 
+## 取轨迹（模型没有 outport 时）
+
+```python
+# 1) 让 Scope 把轨迹存下来；第三个参数是“文件名”，会被拼到模型所在目录
+plecs_call(method="scope", args=["模型名/Scope名", "SaveTraces", "trace_name"])
+
+# 2) 解析（模型目录下的 trace_name.trace）
+plecs_trace_read(path=r"D:\PLECS\demos\xxx\trace_name.trace", csv="out.csv")
+```
+
+实测要点：
+
+- `SaveTraces` 第三个参数传**绝对路径无效**，会被当成文件名拼在模型目录后面；也**不要带 `.trace` 后缀**。
+- `.trace` 里的 `ymax/ymin` 是整条曲线的坐标轴范围，同一曲线下多条信号共用，不是单信号最值。
+- 大文件用 `stats_only=true`：34 MB / 61 万点 约 0.4 s。
+- 实测 buck demo 的 `.trace` 与 `simulate` 时间轴和通道值**逐点完全相同**（均含 t=0）；若某次保存缺首拍，点数会少 1，工具不补点。
+
 ## 参数覆盖
 
 ```python
@@ -106,7 +124,7 @@ plecs_simulate(solver_opts={"SolverType": "Radau"}) # → SolverOpts
 |---|---|
 | `plecs_connect` | `plecs_status` |
 | `plecs_analyze` | `plecs_call("analyze", [模型, 类型, opts])` |
-| `plecs_trace_read` | 无等价物；`plecs_scope` 的 `SaveTraces` 先存 `.trace`，再按 `plecs-cscript` 里 `.trace` 格式自行解析 |
+| `plecs_trace_read` | 本机同名工具，自研解析器（零依赖） |
 | `plecs_file_get/set`（直接改 `.plecs` 文本） | 无；参数批量改优先用 `plecs_set`，文件级改动按 `.plecs` 语法手工编辑或用 `plecs-cscript` 里的 builder |
 | `plecs_save` | **RPC 不提供该命令**（4.7.4 实测报 -32601），不是本机没实现 |
 
@@ -116,7 +134,7 @@ plecs_simulate(solver_opts={"SolverType": "Radau"}) # → SolverOpts
 
 1. **`save`**：4.7.4 的方法清单里没有它，硬做只能绕路改文件，而那会让 PLECS 自己的内存状态和磁盘不一致（它不知道文件被外部改了）——比不做更危险。
 2. **`.plecs` 文本读写**：这类操作的失败是**静默**的——字段名写错不会报错，PLECS 会用默认值，仿真照跑但结果是错的。验证成本远高于 RPC 封装，而本仓库是多机同步的，错一次会同步到所有机器。何况 `plecs-cscript` 已经带了格式说明和带静态自检的 builder。
-3. **`.trace` 解析**：`SaveTraces` 是「模型顶层没 outport 时取波形的正路」，确实值得补；但格式未公开、跟版本有关，得先在目标版本上验证再进仓库，不是拷一份代码就完事。
+3. **`.trace` 解析**：已补。取数流程是 `plecs_scope` 的 `SaveTraces` → `plecs_trace_read`。解析器是自研的（400 行左右，只用 `struct`），格式靠逆向 5 个不同形状的样本得出，再用 `simulate` 逐点对账验证。当初没直接用现成实现，是因为能找到的那个解析器所在仓库**没有 LICENSE**（同类技能仓库是 MIT，但那份 MCP 仓库不是），不能确定可以再分发。
 
 ## 安全边界
 
