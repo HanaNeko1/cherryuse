@@ -13,7 +13,7 @@
 
 ## 专属区域（勿动）
 
-[`AQUARIUM.md`](AQUARIUM.md)（水族箱）归**大肥鱼**所有 —— 即本仓库的常驻 agent，这只蓝色鲸鱼娘。
+[`AQUARIUM.md`](AQUARIUM.md)（水族箱）归**大肥鱼**所有 —— 即本仓库的常驻 agent。
 
 **硬性要求：该文件只读。**
 
