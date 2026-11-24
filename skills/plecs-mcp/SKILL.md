@@ -106,9 +106,17 @@ plecs_simulate(solver_opts={"SolverType": "Radau"}) # → SolverOpts
 |---|---|
 | `plecs_connect` | `plecs_status` |
 | `plecs_analyze` | `plecs_call("analyze", [模型, 类型, opts])` |
-| `plecs_trace_read` | 无等价物；`plecs_scope` 导轨迹，或按 `plecs-cscript` 里 `.trace` 格式自行解析 |
-| `plecs_file_get/set`（直接改 `.plecs` 文本） | 无；要改文件就按 `.plecs` 语法手工编辑 |
-| `plecs_save` | 无；本机的改动不落盘，`close` 即丢弃 |
+| `plecs_trace_read` | 无等价物；`plecs_scope` 的 `SaveTraces` 先存 `.trace`，再按 `plecs-cscript` 里 `.trace` 格式自行解析 |
+| `plecs_file_get/set`（直接改 `.plecs` 文本） | 无；参数批量改优先用 `plecs_set`，文件级改动按 `.plecs` 语法手工编辑或用 `plecs-cscript` 里的 builder |
+| `plecs_save` | **RPC 不提供该命令**（4.7.4 实测报 -32601），不是本机没实现 |
+
+### 为什么这三项没做
+
+边界原则：**MCP 只包 PLECS RPC 真正暴露的东西，文件级/格式级的活留在技能层。**
+
+1. **`save`**：4.7.4 的方法清单里没有它，硬做只能绕路改文件，而那会让 PLECS 自己的内存状态和磁盘不一致（它不知道文件被外部改了）——比不做更危险。
+2. **`.plecs` 文本读写**：这类操作的失败是**静默**的——字段名写错不会报错，PLECS 会用默认值，仿真照跑但结果是错的。验证成本远高于 RPC 封装，而本仓库是多机同步的，错一次会同步到所有机器。何况 `plecs-cscript` 已经带了格式说明和带静态自检的 builder。
+3. **`.trace` 解析**：`SaveTraces` 是「模型顶层没 outport 时取波形的正路」，确实值得补；但格式未公开、跟版本有关，得先在目标版本上验证再进仓库，不是拷一份代码就完事。
 
 ## 安全边界
 
