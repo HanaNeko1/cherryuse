@@ -1,6 +1,6 @@
 ---
 name: plecs-mcp
-description: 本机 PLECS MCP 服务的接线层——用 plecs_status / load_model / get / set / simulate / scope / codegen / call 这十个工具驱动 PLECS Standalone（XML-RPC 1080）。当用户要跑 PLECS 仿真、改模型参数、读波形、扫参数，或遇到 PLECS 连不上（WinError 10061）、仿真报 stiffness/-34000、plecs_call 报 -32601/-32602、simulate 返回被截断的 JSON 时使用。元件参数名、C-Script 写法、.plecs 私有语法、深度排错请看 plecs-cscript 技能。
+description: 本机 PLECS MCP 服务的接线层——用 plecs_status / load_model / get / set / simulate / scope / codegen / call 这十个工具驱动 PLECS Standalone（XML-RPC 1080）。当用户要跑 PLECS 仿真、改模型参数、读波形、批量扫参数，或遇到 PLECS 连不上（WinError 10061）、仿真报 stiffness/-34000、plecs_call 报 -32601/-32602、需要从摘要换回完整波形时使用。元件参数名、C-Script 写法、.plecs 私有语法、深度排错请看 plecs-cscript 技能。
 ---
 
 # PLECS MCP（本机接线层）
