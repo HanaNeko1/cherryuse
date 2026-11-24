@@ -111,9 +111,27 @@ Python 环境统一置于各技能目录的 `venv/`，npm 依赖置于 `node_mod
 
 ## 更新
 
+本地库路径：`D:\PRRRRRRODUCTIN\CherryStudio\cherryuse`。
+
+拉取远程更新：
+
 ```powershell
-cd "D:\PROJECT BIN\home-skill-home\cherryuse"
+cd "D:\PRRRRRRODUCTIN\CherryStudio\cherryuse"
 git pull
 ```
+
+改完技能后提交推送：
+
+```powershell
+cd "D:\PRRRRRRODUCTIN\CherryStudio\cherryuse"
+git add -A
+git commit -m "说明这次改了什么"
+git push
+```
+
+注意两点：
+
+- 本地库只管**仓库里的源文件**。Cherry Studio 实际加载的是 `%APPDATA%\CherryStudio\Data\Skills\<技能名>`，改完仓库要按 [DEPLOY.md](DEPLOY.md) 重装或手动同步过去才生效。
+- 提交前先 `git status` 确认没有把 `venv/`、`node_modules/` 带进去（`.gitignore` 已挡住，但 `setup.ps1` 装出的其他产物未必）。
 
 技能文件更新后 Cherry 会自动同步；`venv/` 与 `node_modules/` 不需要重建，除非依赖变化。
