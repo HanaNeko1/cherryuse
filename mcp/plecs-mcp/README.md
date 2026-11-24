@@ -23,6 +23,8 @@
 
 `plecs_status`、`plecs_help`、`plecs_load_model`、`plecs_close`、`plecs_get`、`plecs_set`、`plecs_simulate`、`plecs_scope`、`plecs_codegen`、`plecs_trace_read`、`plecs_call`。用法见技能 `skills/plecs-mcp/SKILL.md`。
 
+要拿它调 PID/PI 参数时，先按技能里那张「模型/参数/初值/指标/扰动/范围」的表格提需求——文字描述无法验收。
+
 ## 1.3.0 新增：`.trace` 读波形
 
 `plecs_trace_read` 解析 Scope 的 `SaveTraces` 产物，配套 `trace_reader.py`（自研，382 行，只用 `struct`，不包含任何第三方代码）。
