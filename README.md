@@ -2,6 +2,15 @@
 
 个人 Cherry Studio Skill 仓库，用于在多台电脑之间共享技能，本仓库交由Agent更新和维护。
 
+> **维护前必做**：先跑本仓库的同步脚本，看到 `PREP_OK` 再改文件。
+>
+> ```powershell
+> powershell -ExecutionPolicy Bypass -File scripts\prep.ps1
+> ```
+>
+> 它会把本地库快进/rebase 到 `origin`、暂存你自己的未提交改动、并比对各机已安装的技能。多台机器共用同一个仓库，跳过这步很容易白改或者推不上去。
+> 每台机器的克隆路径不同，脚本会自动定位所在仓库；从别处调用时用 `-Repo <克隆路径>`。细节见 [DEPLOY.md](DEPLOY.md) 第 6 节。
+
 ## 技能列表
 
 ### 技术配图
@@ -114,7 +123,7 @@ Python 环境统一置于各技能目录的 `venv/`，npm 依赖置于 `node_mod
 
 ## 更新
 
-本地库路径：`D:\PRRRRRRODUCTIN\CherryStudio\cherryuse`。
+本地库路径各机不同，以本机为例是 `D:\PRRRRRRODUCTIN\CherryStudio\cherryuse`（首次在这台机上维护时先 `git clone` 到自己的目录）。
 
 **动手前先同步**（多机维护，防止两边改冲突）：
 
