@@ -34,7 +34,10 @@
 ```
 cherryuse/
 ├── README.md
+├── DEPLOY.md
 ├── .gitignore
+├── scripts/
+│   └── prep.ps1                ← 多机维护前的同步脚本
 └── skills/
     ├── tech-diagram/
     │   ├── SKILL.md
@@ -112,6 +115,15 @@ Python 环境统一置于各技能目录的 `venv/`，npm 依赖置于 `node_mod
 ## 更新
 
 本地库路径：`D:\PRRRRRRODUCTIN\CherryStudio\cherryuse`。
+
+**动手前先同步**（多机维护，防止两边改冲突）：
+
+```powershell
+cd "D:\PRRRRRRODUCTIN\CherryStudio\cherryuse"
+powershell -ExecutionPolicy Bypass -File scripts\prep.ps1
+```
+
+看到 `PREP_OK` 再开始改。脚本会自动 stash 本地未提交改动、快进/rebase 到 origin、并比对已安装技能与仓库的差异，细节见 [DEPLOY.md](DEPLOY.md) 第 6 节。
 
 拉取远程更新：
 

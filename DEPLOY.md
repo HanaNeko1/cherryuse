@@ -2,6 +2,8 @@
 
 供Agent阅读并执行。README 是索引，本文件是可操作的细节。
 
+> 已经在本机部署过、只是要改仓库内容时，先跑 `scripts\prep.ps1`（见第 6 节），跳过下面全部内容。
+
 ## 0. 前置检查
 
 ```powershell
@@ -141,9 +143,35 @@ Python 依赖逐个确认：
 & "$env:APPDATA\CherryStudio\Data\Skills\xlsx-manipulation\venv\Scripts\python.exe" -c "import openpyxl; print('xlsx ok')"
 ```
 
-## 6. 已知问题
+## 6. 开工前同步（多机维护）
 
-**PowerShell 编码**：PowerShell 5.1 会把无 BOM 的 UTF-8 脚本按 ANSI 解析，中文提示会导致语法错误。本仓库的 `setup.ps1` 全部使用英文输出。
+仓库同时在多台工作站上维护。每次动手改东西之前，先跑一次同步：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\prep.ps1
+```
+
+脚本会依次做四件事：
+
+1. **定位仓库**：从脚本位置往上找 git 根目录，不用关心当前在哪个路径。
+2. **收起本地未提交改动**：脏工作区会自动 `git stash --include-untracked`，同步完再 `git stash pop` 放回。
+3. **同步远程**：`git fetch --prune` 后按情况快进（本地无新提交）或 rebase（两边都有提交）。冲突时自动 `rebase --abort`，本地提交和 stash 都不会丢。
+4. **比对已安装技能**：把仓库里每个 `SKILL.md` 和 `%APPDATA%\CherryStudio\Data\Skills\<技能名>\SKILL.md` 做 SHA256 对比，列出「未安装」和「仓库已改但没重装」的技能。
+
+参数：
+
+| 参数 | 作用 |
+|---|---|
+| `-NoStash` | 工作区脏就直接失败，不自动 stash（想先看改动时用） |
+| `-SkipDrift` | 跳过已安装技能比对 |
+
+退出码：`0` 可以开工；`1` 不是git仓库/ detached HEAD / 拉取失败；`2` rebase 冲突，需要人工处理；`3` 有脏文件且给了 `-NoStash`。
+
+看到 `PREP_OK` 就可以动手了。脚本只读远程、不改远程，安全。
+
+## 7. 已知问题
+
+**输入输出编码**：PowerShell 5.1 会把无 BOM 的 UTF-8 脚本按 ANSI 解析，中文提示会导致语法错误。本仓库的 `setup.ps1`、`scripts\prep.ps1` 全部使用英文输出。
 
 **透明加密（DLP）**：部分企业机器上文件会被 DLP 加密（文件头 `%TSD-Header-###%`）。LibreOffice 导出的图片可能变成密文，Agent 读不到。校验生成结果时优先用 Python 直接渲染。
 
