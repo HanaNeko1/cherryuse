@@ -42,6 +42,7 @@ git --version
 | officecli-docx | `skills/document/officecli-docx/SKILL.md` |
 | officecli-academic-paper | `skills/document/officecli-academic-paper/SKILL.md` |
 | humanizer-zh-academic | `skills/humanizer-zh-academic/SKILL.md` |
+| plecs-mcp | `skills/plecs-mcp/SKILL.md`（还需装 PLECS 并注册 MCP 服务，见第 7 节） |
 
 ### 方式 B：从原始来源安装
 
@@ -171,7 +172,55 @@ powershell -ExecutionPolicy Bypass -File scripts\prep.ps1
 
 看到 `PREP_OK` 就可以动手了。脚本只读远程、不改远程，安全。
 
-## 7. 已知问题
+## 7. PLECS 仿真接入（可选）
+
+只有需要跑 PLECS 电热/电力电子仿真时才装。两层东西：一个 MCP 服务（桥接 PLECS 的 XML-RPC）+ 一个技能（告诉 Agent 怎么用这套工具）。
+
+### 7.1 装 PLECS 与开 RPC
+
+1. 装 PLECS Standalone（已验证 4.7.4；更高版本 RPC 命令集可能变）
+2. 启动后 **File → PLECS Preferences → General**，勾选 **XML-RPC interface**，端口 **1080**
+3. **重启 PLECS 生效**
+
+开关持久化在注册表 `HKCU\Software\Plexim\PLECS4.7`（`XmlRpcEnabled` / `XmlRpcPort`），勾一次以后每次启动自动生效。
+
+验证：端口在听即算通。
+
+```powershell
+Get-NetTCPConnection -LocalPort 1080 -State Listen
+```
+
+> 判定生死看**端口**，不要看进程名：`PLECS.exe` 可能只是个启动器，关窗口后会残留，但 RPC 已随 GUI 进程消失。
+
+### 7.2 部署 MCP 服务
+
+仓库 **不包含** 服务端代码（它是本机已有的 `D:\plecs-mcp\plecs_mcp_server.py`，零依赖、只用标准库）。仍建议纳入版本管理，否则换机器就得重写。
+
+在新机器上：
+
+1. 把 `plecs_mcp_server.py` 放到固定路径（如 `D:\plecs-mcp\`）
+2. 在 Cherry Studio **设置 → MCP → 添加** 一个 stdio 服务：
+
+| 字段 | 值 |
+|---|---|
+| 名称 | `plecs-mcp` |
+| 命令 | `D:\PRRRRRRODUCTIN\ServBay\packages\python\current\python.exe`（任何装得到的 Python 3.8+ 都行） |
+| 参数 | 服务端脚本的绝对路径 |
+
+3. 保存后确认工具列表里出现 `plecs_status` / `plecs_simulate` 等十个工具
+
+### 7.3 装技能
+
+```
+安装这个技能：https://github.com/HanaNeko1/cherryuse/blob/main/skills/plecs-mcp/SKILL.md
+```
+
+装完建议顺手核对两件事（实测踩过）：
+
+- 技能目录名应为 `plecs-cscript` 这类**技能名**，不是 `content`。装错名就改目录名并同步更新数据库里的 `folder_name`。
+- 领域知识另外由 `plecs-cscript` 技能提供（原件：`github.com/alembrt-cmyk/plecs-skill`，MIT）。两者互补：`plecs-mcp` 讲本机工具层，`plecs-cscript` 讲元件、C-Script、`.plecs` 语法与排错。
+
+## 8. 已知问题
 
 **输入输出编码**：PowerShell 5.1 会把无 BOM 的 UTF-8 脚本按 ANSI 解析，中文提示会导致语法错误。本仓库的 `setup.ps1`、`scripts\prep.ps1` 全部使用英文输出。
 

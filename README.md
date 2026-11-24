@@ -34,6 +34,12 @@
 |---|---|
 | [`tech-diagram`](skills/tech-diagram/SKILL.md) | Mermaid 框图、schemdraw 电路图、matplotlib 波形图，并内嵌显示在对话中 |
 
+### 仿真工具
+
+| 技能 | 用途 |
+|---|---|
+| [`plecs-mcp`](skills/plecs-mcp/SKILL.md) | 本机 PLECS MCP 接线层：加载模型、读写参数、跑仿真。需配套 PLECS Standalone + 已注册的 `plecs-mcp` MCP 服务，详见 [DEPLOY.md](DEPLOY.md) 第 7 节 |
+
 ### 文档处理（`skills/document/`）
 
 | 技能 | 用途 | 许可 |
