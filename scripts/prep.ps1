@@ -9,6 +9,12 @@
 #   powershell -ExecutionPolicy Bypass -File scripts\prep.ps1
 #   powershell -ExecutionPolicy Bypass -File scripts\prep.ps1 -NoStash    # refuse to stash, just fail on a dirty tree
 #   powershell -ExecutionPolicy Bypass -File scripts\prep.ps1 -SkipDrift  # skip the installed-skill comparison
+#   powershell -ExecutionPolicy Bypass -File scripts\prep.ps1 -Repo D:\path\to\clone
+#
+# If the script itself is missing from the local clone (for example right after a
+# hard reset to an older commit), fetch a copy and run it from anywhere:
+#   git show origin/main:scripts/prep.ps1 > "$env:TEMP\prep.ps1"
+#   powershell -ExecutionPolicy Bypass -File "$env:TEMP\prep.ps1" -Repo .
 #
 # Exit codes:
 #   0  local clone matches origin, safe to edit
@@ -20,7 +26,8 @@
 
 param(
     [switch]$NoStash,
-    [switch]$SkipDrift
+    [switch]$SkipDrift,
+    [string]$Repo
 )
 
 $ErrorActionPreference = 'Continue'
@@ -37,13 +44,26 @@ function Show-GitResult {
 }
 
 # --- locate the repo ---------------------------------------------------------
-$base = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
-$probe = Invoke-Git @('-C', $base, 'rev-parse', '--show-toplevel')
-if ($probe.Code -ne 0) {
-    Write-Output 'PREP_FAIL: not inside a git repository'
+# Probe order: -Repo, the script's own folder, the current directory. The middle
+# one fails when this script is run from a copy outside the repo (for example a
+# copy fetched with "git show origin/main:scripts/prep.ps1" while behind).
+$candidates = @()
+if ($Repo) { $candidates += $Repo }
+if ($PSScriptRoot) { $candidates += $PSScriptRoot }
+if ($PWD) { $candidates += $PWD.Path }
+$root = $null
+foreach ($cand in $candidates) {
+    $probe = Invoke-Git @('-C', $cand, 'rev-parse', '--show-toplevel')
+    if ($probe.Code -eq 0) {
+        $root = ($probe.Lines | Select-Object -First 1).Trim()
+        break
+    }
+}
+if (-not $root) {
+    Write-Output 'PREP_FAIL: no git repository found from the script folder or the current directory'
+    Write-Output 'hint   : pass -Repo <path-to-clone> or run it from inside the clone'
     exit 1
 }
-$root = ($probe.Lines | Select-Object -First 1).Trim()
 Set-Location $root
 Write-Output "repo   : $root"
 
