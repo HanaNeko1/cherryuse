@@ -69,6 +69,8 @@ cherryuse/
 ├── .gitignore
 ├── scripts/
 │   └── prep.ps1                ← 多机维护前的同步脚本
+├── mcp/
+│   └── plecs-mcp/              ← PLECS MCP 服务端（零依赖，直接可用）
 └── skills/
     ├── tech-diagram/
     │   ├── SKILL.md

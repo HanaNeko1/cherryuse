@@ -13,7 +13,8 @@ description: 本机 PLECS MCP 服务的接线层——用 plecs_status / load_mo
 Agent ──MCP(stdio)──> plecs_mcp_server.py ──XML-RPC :1080──> PLECS Standalone
 ```
 
-- 服务端：`D:\plecs-mcp\plecs_mcp_server.py`（单文件 470 行，**零依赖**，只用标准库）
+- 服务端：`mcp/plecs-mcp/plecs_mcp_server.py`（本仓库内，单文件、**零依赖**、只用标准库；本机运行副本在 `D:\plecs-mcp\`）
+- 版本：1.2.0
 - 启动：`D:\PRRRRRRODUCTIN\ServBay\packages\python\current\python.exe` + 上面那个脚本
 - MCP 名字：`plecs-mcp`（stdio）
 - 端口默认 1080，可用环境变量 `PLECS_RPC_URL` 覆盖（如 `http://localhost:1080/RPC2`）
@@ -28,7 +29,7 @@ Agent ──MCP(stdio)──> plecs_mcp_server.py ──XML-RPC :1080──> PLE
 | `plecs_close` | — | 关闭模型（省略则关最近加载的） |
 | `plecs_get` | `path`,`param` | 读参数，返回**字符串** |
 | `plecs_set` | `path`,`param`,`value` | 写参数 |
-| `plecs_simulate` | — | 跑仿真，可带 `params`/`solver_opts`/`model_name` |
+| `plecs_simulate` | — | 跑仿真；支持 `params`/`solver_opts`/`model_name`/`summary`/`max_points`/`save_to` |
 | `plecs_scope` | `scope_path` | Scope 操作（`ClearTraces` / `HoldTrace`） |
 | `plecs_codegen` | `path` | 代码生成 |
 | `plecs_call` | `method` | 透传其他 PLECS RPC 方法 |
@@ -60,15 +61,23 @@ RPC 开关持久化在注册表 `HKCU\Software\Plexim\PLECS4.7` → `XmlRpcEnabl
 | `plecs_call` 调 `system.*` | **调不到**（会被拼成 `plecs.system.xxx`），需要直连 xmlrpc |
 | `analyze` 签名 | `[模型名, 分析类型, opts]`，分析类型必须**与模型 Analysis Tools 里定义的名字完全一致** |
 
-## 最大缺陷：simulate 的返回值会被截断
+## simulate 的返回值：摘要 / 抽点 / 落盘
 
-服务端 `MAX_OUTPUT_CHARS = 60000`，超过就截断并追加一行提示。实测一个普通 buck demo 仿真返回 **60015 字符（≈15k tokens）**，而且**截断后的 JSON 是不完整的，解析直接失败**。
+服务端 1.2.0 起不会再把上下文塞满：
 
-所以：
+| 情况 | 行为 |
+|---|---|
+| 结果 < 20000 字符 | 直接返回 `Time` + `Values` |
+| 结果 ≥ 20000 字符 | **自动**转统计摘要 + 全量落盘到 `%TEMP%\plecs-mcp\`，响应里给 `saved` 路径 |
+| `summary=true` | 强制摘要，不回传波形数组 |
+| `max_points=N` | 摘要模式下作为 `preview` 点数；普通模式下对 `Time`/`Values` 等间隔抽点（首尾必留） |
+| `save_to=<路径>` | 指定落盘位置（目录自动创建），响应仍走摘要 |
 
-- 别把 `simulate` 的返回当成能直接吃的数据结构，尤其是点数多的模型。
-- 只要关键指标时，先想想能不能用 `plecs_get` / `plecs.analyze` 得到结论，而不是拿全量波形。
-- 真要波形，用 `plecs.scope` 导轨迹或直接读 `.trace`（`plecs-cscript` 里有 `.trace` 解析说明），绕开这个截断。
+摘要包含：`points`、`t_start`/`t_end`、每通道 `min`/`max`/`mean`/`rms`/`p2p`/`n`。实测一个 823 点的 buck demo：从 60015 字符降到 **802 字符**。
+
+需要逐点数据时读 `saved` 指向的 JSON，别让模型把数组搬进上下文。
+
+> 1.1.0 及以前会在 60000 字符处硬截断，得到的 JSON 是坏的、无法解析。如果看到「已截断」字样，说明跑的是旧版服务端，重启 Cherry 即可加载新版。
 
 ## 常见报错对照
 

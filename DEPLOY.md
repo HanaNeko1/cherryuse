@@ -194,11 +194,9 @@ Get-NetTCPConnection -LocalPort 1080 -State Listen
 
 ### 7.2 部署 MCP 服务
 
-仓库 **不包含** 服务端代码（它是本机已有的 `D:\plecs-mcp\plecs_mcp_server.py`，零依赖、只用标准库）。仍建议纳入版本管理，否则换机器就得重写。
+服务端代码就在本仓库：`mcp/plecs-mcp/plecs_mcp_server.py`（单文件、零依赖、只用标准库）。clone 下来就能用，**不需要 pip 装任何东西**。
 
-在新机器上：
-
-1. 把 `plecs_mcp_server.py` 放到固定路径（如 `D:\plecs-mcp\`）
+1. 把 `plecs_mcp_server.py` 放到固定路径（如 `D:\plecs-mcp\`），或直接从 clone 目录引用
 2. 在 Cherry Studio **设置 → MCP → 添加** 一个 stdio 服务：
 
 | 字段 | 值 |
@@ -208,6 +206,8 @@ Get-NetTCPConnection -LocalPort 1080 -State Listen
 | 参数 | 服务端脚本的绝对路径 |
 
 3. 保存后确认工具列表里出现 `plecs_status` / `plecs_simulate` 等十个工具
+
+改完服务端代码后要**重启 Cherry Studio**（或重新连接该 MCP）才会加载新版本。
 
 ### 7.3 装技能
 
