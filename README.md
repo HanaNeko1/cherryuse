@@ -44,6 +44,14 @@
 |---|---|---|
 | [`humanizer-zh-academic`](skills/humanizer-zh-academic/SKILL.md) | 中文学术写作去 AI 味，降低 AIGC 检测率 | MIT |
 
+### 演示文稿（外部安装，不在本仓库）
+
+| 技能 | 用途 | 安装方式 |
+|---|---|---|
+| `ppt-master` | 生成可编辑 pptx：建 deck、美化、图转 PPT、套模板、改原生 PPTX | `skills.sh:hugohe3/ppt-master/ppt-master`，详见 [DEPLOY.md](DEPLOY.md) 第 8 节 |
+
+> `ppt-master` 装完 36 MB+、1.6 万文件，故不进本仓库；安装步骤与依赖清单（含故意跳过的 AGPL 依赖）全写在 DEPLOY.md。
+
 ## 目录结构
 
 ```
@@ -56,8 +64,7 @@ cherryuse/
 │   └── prep.ps1                ← 多机维护前的同步脚本
 ├── mcp/
 │   ├── plecs-mcp/              ← PLECS MCP 服务端（零依赖，直接可用）
-│   └── matlab-mcp/             ← MathWorks 官方 MATLAB MCP 的下载与配置步骤
-└── skills/
+│   └── matlab-mcp/             ← MathWorks 官方 MATLAB MCP 的下载与配置步骤└── skills/
     ├── tech-diagram/
     │   ├── SKILL.md
     │   ├── setup.ps1
@@ -130,6 +137,7 @@ Python 环境统一置于各技能目录的 `venv/`，npm 依赖置于 `node_mod
 - `xlsx-manipulation`：MIT（SKILL.md 元数据声明）
 - `humanizer-zh-academic`：MIT，附 LICENSE
 - `officecli-docx` / `officecli-academic-paper`：技能内**未标注许可证**。公开仓库再分发前建议先确认作者授权；如果不想依赖本仓库，可按 [DEPLOY.md](DEPLOY.md) 的「方式 B」从原始来源安装（`clawhub:iceyliu/...`）
+- `ppt-master`：MIT，**不在本仓库**，从上游 `skills.sh` 安装。它可选依赖 `PyMuPDF` 是 AGPL-3.0，所以我们默认不装（详见 DEPLOY.md 第 8 节）
 
 ## 更新
 

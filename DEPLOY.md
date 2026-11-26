@@ -59,6 +59,7 @@ git --version
 | officecli-docx | `clawhub:iceyliu/officecli-docx` | 未标注 |
 | officecli-academic-paper | `clawhub:iceyliu/officecli-academic-paper` | 未标注 |
 | humanizer-zh-academic | `https://skills.sh/redbaronyyyyy-eng/humanizer-zh-academic/humanizer-zh-academic` | MIT |
+| ppt-master | `skills.sh:hugohe3/ppt-master/ppt-master` | MIT |
 
 用法：对 Agent 说「安装技能：`clawhub:iceyliu/officecli-docx`」，或直接给对应页面的 URL。
 
@@ -77,6 +78,7 @@ git --version
 | officecli-academic-paper | 同上，路径换成 `officecli-academic-paper`；CLI 未装时加 `-Install` |
 | tech-diagram | 同上，路径换成 `tech-diagram` |
 | humanizer-zh-academic | 无依赖 |
+| ppt-master | 见第 8 节（需建 venv） |
 
 成功标志：输出包含 `SETUP_OK`（pdf 的 OCR 部分输出 `OCR_OK`）。
 
@@ -222,7 +224,69 @@ Get-NetTCPConnection -LocalPort 1080 -State Listen
 - 技能目录名应为 `plecs-cscript` 这类**技能名**，不是 `content`。装错名就改目录名并同步更新数据库里的 `folder_name`。
 - 领域知识另外由 `plecs-cscript` 技能提供（原件：`github.com/alembrt-cmyk/plecs-skill`，MIT）。两者互补：`plecs-mcp` 讲本机工具层，`plecs-cscript` 讲元件、C-Script、`.plecs` 语法与排错。
 
-## 8. 已知问题
+## 8. PPT Master（可选，不在仓库内）
+
+[MIT](https://github.com/hugohe3/ppt-master)，做可编辑 pptx 的分路线工作流。**不进仓库**：安装后 36 MB+、1.6 万个文件（模板库占大头），塞进 git 会让每台机器 clone 变慢。
+
+### 8.1 安装
+
+```
+安装技能：skills.sh:hugohe3/ppt-master/ppt-master
+```
+
+装完**核对目录名**：应为 `Skills\ppt-master`。渠道偶尔会把目录名装成 `content`，这时需改目录名并同步数据库里的 `folder_name`。
+
+### 8.2 依赖
+
+要求 Python 3.10–3.14。在技能目录建独立 venv，**不要装到系统 Python 里**：
+
+```powershell
+$s  = "$env:APPDATA\CherryStudio\Data\Skills\ppt-master"
+$uv = "$env:USERPROFILE\.cherrystudio\bin\uv.exe"
+& $uv venv "$s\venv" --python 3.12
+& $uv pip install --python "$s\venv\Scripts\python.exe" `
+  PyYAML "python-pptx>=0.6.21" "XlsxWriter>=3.0.0" "skia-pathops>=0.9.2" "uharfbuzz>=0.50.0" `
+  "Pillow>=9.0.0" "numpy>=1.20.0" "requests>=2.31.0" "beautifulsoup4>=4.12.0" `
+  "markdownify>=0.11.6" "mammoth>=1.6.0" "openpyxl>=3.1.0" "edge-tts>=7.2.8" `
+  "flask>=3.0.0" "curl_cffi>=0.7.0" --index-url https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+**故意不装的依赖**：
+
+| 包 | 为什么跳过 |
+|---|---|
+| `PyMuPDF` | **AGPL-3.0**。本仓库要再分发，不要沾它；只服务 PDF→Markdown 一条路，需要时单独装 |
+| `google-genai` | AI 配图后端，需要 API key；不用 AI 配图就不装 |
+| `nbconvert` / `ebooklib` | 仅 `.ipynb` / `.epub` 输入时需要 |
+| `rapidocr` / `onnxruntime` | 仅 Image-to-PPTX 需要，带 OpenCV 约 170 MB |
+
+### 8.3 验证
+
+```powershell
+$py = "$env:APPDATA\CherryStudio\Data\Skills\ppt-master\venv\Scripts\python.exe"
+& $py "$env:APPDATA\CherryStudio\Data\Skills\ppt-master\scripts\attribution_guard.py"   # 必须 exit 0
+```
+
+`attribution_guard.py` 是作者内置的完整性校验门，返回非零就中止，**不要试图绕过**。
+
+### 8.4 三个硬规则（踩过才知道）
+
+1. **转换前必须有 `spec_lock.md`**，否则 `svg_to_pptx.py` 直接拒绝。模板在 `templates/scaffolds/spec_lock.md`。
+2. **必须先有通过的质检报告**，否则拒绝发布：
+   ```powershell
+   & $py "...\scripts\svg_quality_checker.py" <项目路径> --canonical-authoring --stage final --json
+   ```
+3. **SVG 的书写约定**（质检器会逐条报错）：
+   - 根 `<svg>` 必须带 `font-family` 默认值（否则中文宽度估算偏小）
+   - 每个逻辑单元包在 `<g id="..." data-pptx-bounds="x y width height">` 里
+   - 带 `data-pptx-role` 的元素必须有 `id`
+
+### 8.5 已知问题
+
+- 手写 SVG 里的中文文本**末尾单字会被挤到下一行**（宽度估算偏紧）。尚未跑完整工作流确认是否只是手写 SVG 的问题；用它的执行器生成页面时可能不复现。
+- 项目建在 `<工作目录>/projects/<项目名>/` 下，不在技能目录里。在 Cherry 里用时把工作目录锚到会话工作区，否则文件会散。
+
+## 9. 已知问题
 
 **输入输出编码**：PowerShell 5.1 会把无 BOM 的 UTF-8 脚本按 ANSI 解析，中文提示会导致语法错误。本仓库的 `setup.ps1`、`scripts\prep.ps1` 全部使用英文输出。
 
